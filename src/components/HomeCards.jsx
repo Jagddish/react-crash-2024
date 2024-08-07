@@ -1,5 +1,5 @@
 import Card from "./Card";
-const HomeCards = () => {
+const HomeCards = ({ bg = "bg-gray-100" }) => {
   return (
     <div>
       <section className="py-4">

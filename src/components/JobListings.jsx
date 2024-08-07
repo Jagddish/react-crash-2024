@@ -1,5 +1,9 @@
+import React from "react";
 import jobs from "../jobs.json";
-const JobListing = () => {
+import JobListing from "./JobListing";
+
+const JobListings = () => {
+  const recentJobs = jobs.slice(0, 3);
   return (
     <div>
       <section className="bg-blue-50 px-4 py-10">
@@ -8,12 +12,10 @@ const JobListing = () => {
             Browse Jobs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {jobs.map((job) => (
+            {/* <!-- Job Listing 1 --> */}
+            {recentJobs.map((job) => (
               <JobListing key={job.id} job={job} />
             ))}
-            {/* <!-- Job Listing 1 --> */}
-            {/* <!-- Job Listing 2 --> */}
-            {/* <!-- Job Listing 3 --> */}
           </div>
         </div>
       </section>
@@ -21,4 +23,4 @@ const JobListing = () => {
   );
 };
 
-export default JobListing;
+export default JobListings;
