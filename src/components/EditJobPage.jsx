@@ -1,11 +1,11 @@
 import { useLoaderData, useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 const EditJobPage = ({ updateJobSumit }) => {
   const navigate = useNavigate();
+  // previous data
   const job = useLoaderData();
   const { id } = useParams();
-
   const [form, setForm] = useState({
     id: job.id,
     title: job.title,
@@ -14,37 +14,33 @@ const EditJobPage = ({ updateJobSumit }) => {
     description: job.description,
     salary: job.salary,
     company: {
-      name: job.companyName,
-      description: job.companyDescription,
-      contactEmail: job.contactEmail,
-      contactPhone: job.contactPhone,
+      name: job.company.name,
+      description: job.company.description,
+      contactEmail: job.company.contactEmail,
+      contactPhone: job.company.contactPhone,
     },
   });
 
   const handleFormChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setForm((prev) => {
+      if (name.includes(".")) {
+        const [objectKey, nestedKey] = name.split(".");
+        return {
+          ...prev,
+          [objectKey]: {
+            ...prev[objectKey],
+            [nestedKey]: value,
+          },
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
-  useEffect(() => {
-    if (job) {
-      setForm({
-        id: job.id,
-        title: job.title,
-        type: job.type,
-        location: job.location,
-        description: job.description,
-        salary: job.salary,
-        company: {
-          name: job.companyName,
-          description: job.companyDescription,
-          contactEmail: job.contactEmail,
-          contactPhone: job.contactPhone,
-        },
-      });
-    }
-  }, [job]);
+
   const submitForm = (e) => {
     e.preventDefault();
     const updatedJob = {
@@ -55,13 +51,14 @@ const EditJobPage = ({ updateJobSumit }) => {
       description: form.description,
       salary: form.salary,
       company: {
-        name: form.companyName,
-        description: form.companyDescription,
-        contactEmail: form.contactEmail,
-        contactPhone: form.contactPhone,
+        name: form.company.name,
+        description: form.company.description,
+        contactEmail: form.company.contactEmail,
+        contactPhone: form.company.contactPhone,
       },
     };
     updateJobSumit(updatedJob);
+    console.log(updatedJob);
     toast.success("Job Updated Successfully");
 
     return navigate(`/jobs/${id}`);
@@ -72,7 +69,7 @@ const EditJobPage = ({ updateJobSumit }) => {
         <div className="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
           <form onSubmit={submitForm}>
             <h2 className="text-3xl text-center font-semibold mb-6">
-              Update Job
+              Edit Job
             </h2>
 
             <div className="mb-4">
@@ -87,6 +84,7 @@ const EditJobPage = ({ updateJobSumit }) => {
                 name="type"
                 className="border rounded w-full py-2 px-3"
                 required
+                value={form.type}
                 onChange={handleFormChange}
               >
                 <option value="Full-Time">Full-Time</option>
@@ -103,9 +101,10 @@ const EditJobPage = ({ updateJobSumit }) => {
               <input
                 type="text"
                 id="title"
+                value={form.title}
                 name="title"
                 className="border rounded w-full py-2 px-3 mb-2"
-                placeholder="eg. Beautiful Apartment In Miami"
+                placeholder="eg. Fullstack Software engineer"
                 required
                 onChange={handleFormChange}
               />
@@ -119,6 +118,7 @@ const EditJobPage = ({ updateJobSumit }) => {
               </label>
               <textarea
                 id="description"
+                value={form.description}
                 name="description"
                 className="border rounded w-full py-2 px-3"
                 rows="4"
@@ -136,6 +136,7 @@ const EditJobPage = ({ updateJobSumit }) => {
               </label>
               <select
                 id="salary"
+                value={form.salary}
                 name="salary"
                 className="border rounded w-full py-2 px-3"
                 required
@@ -161,6 +162,7 @@ const EditJobPage = ({ updateJobSumit }) => {
               </label>
               <input
                 type="text"
+                value={form.location}
                 id="location"
                 name="location"
                 className="border rounded w-full py-2 px-3 mb-2"
@@ -181,8 +183,9 @@ const EditJobPage = ({ updateJobSumit }) => {
               </label>
               <input
                 type="text"
+                value={form.company.name}
                 id="company"
-                name="companyName"
+                name="company.name"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Company Name"
                 onChange={handleFormChange}
@@ -198,7 +201,8 @@ const EditJobPage = ({ updateJobSumit }) => {
               </label>
               <textarea
                 id="company_description"
-                name="companyDescription"
+                name="company.description"
+                value={form.company.description}
                 className="border rounded w-full py-2 px-3"
                 rows="4"
                 placeholder="What does your company do?"
@@ -216,7 +220,8 @@ const EditJobPage = ({ updateJobSumit }) => {
               <input
                 type="email"
                 id="contact_email"
-                name="contactEmail"
+                value={form.company.contactEmail}
+                name="company.contactEmail"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Email address for applicants"
                 required
@@ -232,8 +237,9 @@ const EditJobPage = ({ updateJobSumit }) => {
               </label>
               <input
                 type="tel"
+                value={form.company.contactPhone}
                 id="contact_phone"
-                name="contactPhone"
+                name="company.contactPhone"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Optional phone for applicants"
                 onChange={handleFormChange}

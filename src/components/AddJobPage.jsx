@@ -2,24 +2,40 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 const AddJobPage = ({ addJobSumit }) => {
+  // initial form state
   const [form, setForm] = useState({
     type: "Full-Time",
     title: "",
     description: "",
     salary: "Under $50K",
     location: "",
-    companyName: "",
-    companyDescription: "",
-    contactEmail: "",
-    contactPhone: "",
+    company: {
+      name: "",
+      description: "",
+      contactEmail: "",
+      contactPhone: "",
+    },
   });
 
   const navigate = useNavigate();
   const handleFormChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setForm((prev) => {
+      if (name.includes(".")) {
+        const [objectKey, nestedKey] = name.split(".");
+        return {
+          ...prev,
+          [objectKey]: {
+            ...prev[objectKey],
+            [nestedKey]: value,
+          },
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
   const submitForm = (e) => {
     e.preventDefault();
@@ -30,12 +46,13 @@ const AddJobPage = ({ addJobSumit }) => {
       description: form.description,
       salary: form.salary,
       company: {
-        name: form.companyName,
-        description: form.companyDescription,
-        contactEmail: form.contactEmail,
-        contactPhone: form.contactPhone,
+        name: form.company.name,
+        description: form.company.description,
+        contactEmail: form.company.contactEmail,
+        contactPhone: form.company.contactPhone,
       },
     };
+
     addJobSumit(newJob);
     toast.success("Job Added Successfully");
 
@@ -78,7 +95,7 @@ const AddJobPage = ({ addJobSumit }) => {
                 id="title"
                 name="title"
                 className="border rounded w-full py-2 px-3 mb-2"
-                placeholder="eg. Beautiful Apartment In Miami"
+                placeholder="eg. Fullstack Software engineer"
                 required
                 onChange={handleFormChange}
               />
@@ -155,7 +172,7 @@ const AddJobPage = ({ addJobSumit }) => {
               <input
                 type="text"
                 id="company"
-                name="companyName"
+                name="company.name"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Company Name"
                 onChange={handleFormChange}
@@ -171,7 +188,7 @@ const AddJobPage = ({ addJobSumit }) => {
               </label>
               <textarea
                 id="company_description"
-                name="companyDescription"
+                name="company.description"
                 className="border rounded w-full py-2 px-3"
                 rows="4"
                 placeholder="What does your company do?"
@@ -189,7 +206,7 @@ const AddJobPage = ({ addJobSumit }) => {
               <input
                 type="email"
                 id="contact_email"
-                name="contactEmail"
+                name="company.contactEmail"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Email address for applicants"
                 required
@@ -206,7 +223,7 @@ const AddJobPage = ({ addJobSumit }) => {
               <input
                 type="tel"
                 id="contact_phone"
-                name="contactPhone"
+                name="company.contactPhone"
                 className="border rounded w-full py-2 px-3"
                 placeholder="Optional phone for applicants"
                 onChange={handleFormChange}
